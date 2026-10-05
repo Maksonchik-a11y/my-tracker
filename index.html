@@ -4,22 +4,113 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Школьный проект: Геотрекер</title>
+    
+    <!-- Подключаем стили и скрипты карты Leafлет из надежного источника -->
     <link rel="stylesheet" href="https://unpkg.com" />
+    <script src="https://unpkg.com"></script>
+
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f0f2f5; color: #333; }
-        h1 { color: #007bff; }
-        #start-btn { padding: 12px 25px; font-size: 16px; font-weight: bold; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        #status { margin: 20px auto; padding: 15px; max-width: 400px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        #map { width: 100%; max-width: 600px; height: 300px; margin: 20px auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; margin: 0; padding: 20px; background-color: #f4f6f9; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #007bff; margin-top: 0; }
+        button { padding: 12px 25px; font-size: 16px; font-weight: bold; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 25px; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        button:hover { background-color: #218838; }
+        #status { margin: 15px 0; font-size: 15px; color: #555; line-height: 1.5; }
+        #map { width: 100%; height: 380px; margin-top: 15px; border-radius: 8px; background: #e0e0e0; }
     </style>
 </head>
 <body>
-    <h1>Мониторинг геолокации</h1>
-    <p>Режим: ТЕЛЕФОН (Передатчик)</p>
-    <button id="start-btn">Включить отслеживание</button>
-    <div id="status">Нажмите кнопку, чтобы запустить трансляцию GPS.</div>
+
+<div class="container">
+    <h1>Система геолокационного мониторинга</h1>
+    <p style="color: #666; margin-top: -10px;">Практическая часть проекта по информатике</p>
+    
+    <button id="start-btn">Включить трансляцию GPS</button>
+    <div id="status">Нажмите кнопку, если вы открыли приложение со смартфона.</div>
+    
     <div id="map"></div>
-    <script src="https://unpkg.com"></script>
-    <script src="script.js"></script>
+</div>
+
+<script>
+const startBtn = document.getElementById('start-btn');
+const statusDiv = document.getElementById('status');
+let map, marker, isMapInit = false;
+
+// Создаем карту сразу при загрузке страницы, центрируем по умолчанию (например, на центр России/Москву)
+function initDefaultMap() {
+    map = L.map('map').setView([55.7558, 37.6173], 4); 
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+    isMapInit = true;
+}
+
+// Запускаем пустую карту сразу, чтобы на экране не было серого поля
+window.addEventListener('load', initDefaultMap);
+
+function successGPS(position) {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    
+    statusDiv.innerHTML = `
+        <b style="color: green;">● Трансляция активна</b><br>
+        <b>Широта:</b> ${lat.toFixed(6)} | <b>Долгота:</b> ${lng.toFixed(6)}
+    `;
+
+    // Центрируем карту на реальном месте устройства и ставим маркер
+    map.setView([lat, lng], 16);
+    if (!marker) {
+        marker = L.marker([lat, lng]).addTo(map);
+        marker.bindPopup("Отслеживаемое устройство").openPopup();
+    } else {
+        marker.setLatLng([lat, lng]);
+    }
+
+    // Сохраняем координаты в облачный буфер через бесплатный свободный сервер dweet.io
+    // 'school_tracker_project_2026' - это уникальное имя вашей ячейки
+    fetch(`https://dweet.io{lat}&lng=${lng}`)
+        .catch(err => console.log("Ошибка отправки данных в облако"));
+}
+
+function errorGPS() {
+    statusDiv.innerHTML = "<b style='color: red;'>Ошибка: не удалось получить доступ к GPS смартфона.</b>";
+}
+
+startBtn.addEventListener('click', () => {
+    startBtn.style.display = 'none';
+    statusDiv.innerHTML = "Поиск спутников GPS...";
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(successGPS, errorGPS, { enableHighAccuracy: true });
+    }
+});
+
+// --- ЛОГИКА ДЛЯ ЭКРАНА КОМПЬЮТЕРА ---
+// Каждые 3 секунды компьютер автоматически проверяет облако на наличие координат от телефона
+setInterval(() => {
+    fetch('https://dweet.io')
+        .then(response => response.json())
+        .then(json => {
+            if (json.this === "succeeded") {
+                const data = json.with[0].content;
+                const lat = parseFloat(data.lat);
+                const lng = parseFloat(data.lng);
+                
+                statusDiv.innerHTML = `
+                    <b style="color: red; animation: blink 1s infinite;">● ИДЕТ УДАЛЕННОЕ СЛЕДОВАНИЕ ЗА ЦЕЛЬЮ</b><br>
+                    <b>Координаты смартфона:</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}
+                `;
+                
+                map.setView([lat, lng], 16);
+                if (!marker) {
+                    marker = L.marker([lat, lng]).addTo(map);
+                } else {
+                    marker.setLatLng([lat, lng]);
+                }
+            }
+        })
+        .catch(err => console.log("Ожидание данных..."));
+}, 3000);
+</script>
+
 </body>
 </html>
