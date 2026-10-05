@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Школьный проект: Геотрекер</title>
+    
+    <!-- Подключаем стили для карты Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com" />
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        h1 { margin-bottom: 5px; color: #007bff; }
+        .subtitle { color: #666; margin-bottom: 20px; }
+        
+        /* Стили кнопки */
+        #start-btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+        #start-btn:hover { background-color: #0056b3; transform: translateY(-2px); }
+        
+        /* Контейнер для вывода данных */
+        #status {
+            margin: 20px auto;
+            padding: 15px;
+            max-width: 400px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            font-size: 15px;
+        }
+        
+        /* Стили для блока карты */
+        #map {
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            margin: 20px auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            background: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Мониторинг геолокации</h1>
+    <div class="subtitle">Практическая часть проекта по информатике / безопасности</div>
+    
+    <button id="start-btn">Включить отслеживание</button>
+    
+    <div id="status">Нажмите кнопку выше, чтобы запросить доступ к GPS устройства.</div>
+    
+    <!-- Сюда JavaScript встроит карту -->
+    <div id="map"></div>
+
+    <!-- Подключаем саму библиотеку карт Leaflet -->
+    <script src="https://unpkg.com"></script>
+    <!-- Подключаем ваш файл с логикой -->
+    <script src="script.js"></script>
+</body>
+</html>
