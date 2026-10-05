@@ -3,19 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Экран Мониторинга (ПК)</title>
+    <title>Школьный проект: Геотрекер</title>
     <link rel="stylesheet" href="https://unpkg.com" />
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f0f2f5; }
-        h1 { color: #dc3545; }
-        #monitor-status { margin: 20px auto; padding: 15px; max-width: 400px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-weight: bold; }
-        #map { width: 100%; max-width: 700px; height: 400px; margin: 20px auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f0f2f5; color: #333; }
+        h1 { color: #007bff; }
+        #start-btn { padding: 12px 25px; font-size: 16px; font-weight: bold; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #status { margin: 20px auto; padding: 15px; max-width: 400px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        #map { width: 100%; max-width: 600px; height: 300px; margin: 20px auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     </style>
 </head>
 <body>
 
-    <h1>Панель оператора: Отслеживание</h1>
-    <div id="monitor-status" style="color: blue;">Ожидание сигнала от телефона через интернет...</div>
+    <h1>Мониторинг геолокации</h1>
+    <p>Режим: ТЕЛЕФОН (Передатчик)</p>
+    
+    <button id="start-btn">Включить отслеживание</button>
+    <div id="status">Нажмите кнопку, чтобы запустить трансляцию GPS.</div>
     <div id="map"></div>
 
     <script src="https://unpkg.com"></script>
